@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/jonatandahora/parsex.svg?branch=master)](https://travis-ci.org/jonatandahora/parsex)
 # Parsex
 
 **TODO: Add description**
@@ -17,4 +18,3 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
         def application do
           [applications: [:parsex]]
         end
-
