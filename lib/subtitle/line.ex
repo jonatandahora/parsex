@@ -9,15 +9,31 @@ defmodule Parsex.Subtitle.Line do
     |> Enum.filter(fn(elem) -> elem != ["\n"] end)
     |> Enum.map(fn(line) -> Parsex.Subtitle.Line.parse_line(line) end)
   end
+
   def unescape_line(line) do
     Enum.map(line, fn(text) ->
       String.replace(text, ~r/\n|\t|\r/, "")
     end)
   end
+
   def format_timestamp(timestamp) do
     timestamp = String.split(timestamp, " --> ")
-    %{start_time: timestamp |> hd, end_time: timestamp |> tl |> hd}
+    start_time = List.first(timestamp) |> timestamp_to_seconds
+    end_time = List.last(timestamp) |> timestamp_to_seconds
+    %{start_time: start_time, end_time: end_time}
   end
+
+  defp timestamp_to_seconds(time) do
+    [_, h, m, s, ms] = Regex.run(~r/(?<h>\d+):(?<m>\d+):(?<s>\d+)[,.](?<ms>\d+)/, time)
+    (String.to_integer(h) * 3600)
+    |> +((String.to_integer(m)) * 60)
+    |> +(String.to_float("#{s}.#{ms}"))
+  end
+
+  defp seconds_to_timestamp(seconds) do
+    
+  end
+
   def parse_line(line) do
     line = unescape_line(line)
     cond do
