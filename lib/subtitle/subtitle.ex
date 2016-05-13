@@ -6,9 +6,15 @@ defmodule Parsex.Subtitle do
 
   def parse_file(filename) do
     stream = File.stream!(filename, [:read, :utf8], :line)
-
+    filename = String.split(to_string(filename), "/") |> List.last()
     lines = Line.parse_lines(stream)
 
     %Parsex.Subtitle{filename: filename, lines: lines}
+  end
+
+  def parse_struct(subtitle) do
+    filename = subtitle.filename
+    content = Line.lines_to_string(subtitle.lines)
+    File.write(filename, content, [:write])
   end
 end

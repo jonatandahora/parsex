@@ -7,6 +7,16 @@ defmodule Parsex.Subtitle.Line do
     Enum.chunk_by(file_stream, fn(line) -> line != "\n" end)
     |> Enum.filter(fn(elem) -> elem != ["\n"] end)
     |> Enum.map(fn(line) -> parse_line(line) end)
+    |> Enum.drop_while(fn(line) -> is_nil(line) end)
+  end
+
+  def lines_to_string(lines) do
+    Enum.map(lines, fn(line)->
+      "#{line.number}\n" <>
+      "#{Parsex.Subtitle.Line.seconds_to_timestamp(line.start_time)} --> " <>
+      "#{Parsex.Subtitle.Line.seconds_to_timestamp(line.end_time)}\n" <>
+      "#{Enum.join(line.text, "\n")}\n\n"
+    end) |> Enum.join()
   end
 
   def timestamp_to_seconds(time) do
@@ -20,8 +30,7 @@ defmodule Parsex.Subtitle.Line do
     [sec_int, decimal] = Float.to_string(seconds, [decimals: 3])
     |> String.split(".")
     |> Enum.map(fn(elem) -> String.to_integer(elem) end)
-
-    h = round(Float.floor(seconds) / 3600) |> append_zero()
+    h = round(Float.floor(seconds / 3600)) |> append_zero()
     m = round(Float.floor(rem(sec_int, 3600) / 60)) |> append_zero()
     s = rem(sec_int , 60) |> append_zero()
     ms = decimal |> append_zero(:ms)
