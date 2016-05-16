@@ -5,11 +5,16 @@ defmodule Parsex.Subtitle do
   alias Parsex.Subtitle.Line
 
   def parse_file(filename) do
-    stream = File.stream!(filename, [:read, :utf8], :line)
-    filename = String.split(to_string(filename), "/") |> List.last()
-    lines = Line.parse_lines(stream)
+    try do
+      stream = File.stream!(filename, [:read, :utf8], :line)
+      filename = String.split(to_string(filename), "/") |> List.last()
+      lines = Line.parse_lines(stream)
 
-    %Parsex.Subtitle{filename: filename, lines: lines}
+      {:ok, %Parsex.Subtitle{filename: filename, lines: lines}}
+    rescue
+      UndefinedFunctionError -> {:error, :invalid_encoding}
+      _ -> {:error}
+    end
   end
 
   def parse_struct(subtitle) do

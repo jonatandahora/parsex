@@ -15,8 +15,8 @@ defmodule Parsex.Subtitle.Line do
       "#{line.number}\n" <>
       "#{Parsex.Subtitle.Line.seconds_to_timestamp(line.start_time)} --> " <>
       "#{Parsex.Subtitle.Line.seconds_to_timestamp(line.end_time)}\n" <>
-      "#{Enum.join(line.text, "\n")}\n\n"
-    end) |> Enum.join()
+      "#{Enum.join(line.text, "\n")}\n"
+    end) |> Enum.join("\n")
   end
 
   def timestamp_to_seconds(time) do
