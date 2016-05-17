@@ -77,4 +77,28 @@ defmodule Parsex.Subtitle.Line do
       _ -> nil
     end
   end
+
+  defp sync_line(subtitle, line, sync_time) do
+
+  end
+
+  defp syc_all(subtitle, sync_time) do
+
+  end
+
+  def parse_sync_time(sync_time) do
+    instances = %{"ms" => 0.001, "s" => 1, "m" => 60, "h" => 3600}
+
+    case String.match?(sync_time, ~r/([+-])([.,0-9]+)(ms|s|m|h)/) do
+      nil -> nil
+      _ ->
+        try do
+          [_, operator, time, time_instance] = Regex.run(~r/([+-])([.,0-9]+)(ms|s|m|h)/, sync_time)
+          time_to_add = elem(Float.parse(time), 0) * instances[time_instance]
+          {operator, time_to_add}
+        rescue
+          _ -> nil
+        end
+    end
+  end
 end
