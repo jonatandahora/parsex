@@ -22,4 +22,20 @@ defmodule Parsex.Subtitle do
     content = Line.lines_to_string(subtitle.lines)
     File.write(filename, content, [:write])
   end
+
+  def sync_subtitle(subtitle \\ nil, sync_time \\ "+0ms")
+  def sync_subtitle(subtitle = %Parsex.Subtitle{}, sync_time) do
+    synced_lines = Line.sync_all_lines(subtitle.lines, sync_time)
+    Map.put(subtitle, :lines, synced_lines)
+  end
+  def sync_subtitle(subtitle, sync_time) do
+    {status, subtitle} = parse_file(subtitle)
+    case status do
+      :ok ->
+        synced_lines = Line.sync_all_lines(subtitle.lines, sync_time)
+        Map.put(subtitle, :lines, synced_lines)
+        |> parse_struct
+      _ -> :error
+    end
+  end
 end

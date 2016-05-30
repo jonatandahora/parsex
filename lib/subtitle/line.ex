@@ -10,6 +10,14 @@ defmodule Parsex.Subtitle.Line do
     |> Enum.drop_while(fn(line) -> is_nil(line) end)
   end
 
+  def sync_all_lines(lines, sync_time) do
+    try do
+      Enum.map(lines, fn(line) -> sync_line(line, sync_time) end)
+    rescue
+      _ -> {nil, :error}
+    end
+  end
+
   def lines_to_string(lines) do
     Enum.map(lines, fn(line)->
       "#{line.number}\n" <>
@@ -78,26 +86,34 @@ defmodule Parsex.Subtitle.Line do
     end
   end
 
-  defp sync_line(subtitle, line, sync_time) do
-
+  defp sync_line(line, sync_time) do
+    {operator, parsed_sync_time} = parse_sync_time(sync_time)
+    start_time = line.start_time
+    end_time = line.end_time
+    {start_time, end_time} = case operator do
+      "+" ->
+        {start_time + parsed_sync_time, end_time + parsed_sync_time}
+      "-" ->
+        {start_time - parsed_sync_time, end_time - parsed_sync_time}
+      _ -> nil
+    end
+    line
+    |> Map.put(:start_time, start_time)
+    |> Map.put(:end_time, end_time)
   end
 
-  defp syc_all(subtitle, sync_time) do
-
-  end
-
-  def parse_sync_time(sync_time) do
+  defp parse_sync_time(sync_time) do
     instances = %{"ms" => 0.001, "s" => 1, "m" => 60, "h" => 3600}
 
     case String.match?(sync_time, ~r/([+-])([.,0-9]+)(ms|s|m|h)/) do
-      nil -> nil
+      nil -> {nil, :error}
       _ ->
         try do
           [_, operator, time, time_instance] = Regex.run(~r/([+-])([.,0-9]+)(ms|s|m|h)/, sync_time)
           time_to_add = elem(Float.parse(time), 0) * instances[time_instance]
           {operator, time_to_add}
         rescue
-          _ -> nil
+          _ -> {nil, :error}
         end
     end
   end
