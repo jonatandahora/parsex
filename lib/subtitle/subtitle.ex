@@ -6,7 +6,7 @@ defmodule Parsex.Subtitle do
 
   def parse_file(filename) do
     try do
-      stream = File.stream!(filename, [:read, :utf8], :line)
+      stream = File.stream!(filename, [], :line)
       filename = String.split(to_string(filename), "/") |> List.last()
       lines = Line.parse_lines(stream)
 

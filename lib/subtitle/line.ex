@@ -48,8 +48,10 @@ defmodule Parsex.Subtitle.Line do
 
   defp unescape_line(line) do
     Enum.map(line, fn(text) ->
-      String.replace(text, ~r/\n|\t|\r/, "")
+      text = String.replace(text, ~r/\n|\t|\r/, "")
+      :iconv.convert("UTF-8", "WINDOWS-1252", text)
     end)
+
   end
 
   defp format_timestamp(timestamp) do
