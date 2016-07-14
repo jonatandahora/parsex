@@ -30,8 +30,8 @@ defmodule Parsex.Subtitle.Line do
   defp timestamp_to_seconds(time) do
     [_, h, m, s, ms] = Regex.run(~r/(?<h>\d+):(?<m>\d+):(?<s>\d+)[,.](?<ms>\d+)/, time)
     (String.to_integer(h) * 3600)
-    |> +((String.to_integer(m)) * 60)
-    |> +(String.to_float("#{s}.#{ms}"))
+    |> Kernel.+((String.to_integer(m)) * 60)
+    |> Kernel.+(String.to_float("#{s}.#{ms}"))
   end
 
   defp seconds_to_timestamp(seconds) do

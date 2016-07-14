@@ -4,7 +4,7 @@ defmodule Parsex.Mixfile do
   def project do
     [app: :parsex,
      version: "0.0.1",
-     elixir: "~> 1.2",
+     elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
@@ -28,7 +28,7 @@ defmodule Parsex.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:iconv, "~> 1.0.0", git: "https://github.com/processone/iconv.git"}
+      {:iconv, "~> 1.0", git: "https://github.com/processone/iconv.git"}
     ]
   end
 end
