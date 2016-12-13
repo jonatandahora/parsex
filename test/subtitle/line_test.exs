@@ -15,8 +15,4 @@ defmodule Parsex.Subtitle.LineTest do
     assert seconds != invalid_timestamp_in_seconds
   end
 
-  test "resync time conversion" do
-    resync_time = "+10s"
-    
-  end
 end

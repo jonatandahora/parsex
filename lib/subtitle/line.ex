@@ -27,14 +27,14 @@ defmodule Parsex.Subtitle.Line do
     end) |> Enum.join("\n")
   end
 
-  defp timestamp_to_seconds(time) do
+  def timestamp_to_seconds(time) do
     [_, h, m, s, ms] = Regex.run(~r/(?<h>\d+):(?<m>\d+):(?<s>\d+)[,.](?<ms>\d+)/, time)
     (String.to_integer(h) * 3600)
     |> Kernel.+((String.to_integer(m)) * 60)
     |> Kernel.+(String.to_float("#{s}.#{ms}"))
   end
 
-  defp seconds_to_timestamp(seconds) do
+  def seconds_to_timestamp(seconds) do
     [sec_int, decimal] = Float.to_string(seconds, [decimals: 3])
     |> String.split(".")
     |> Enum.map(fn(elem) -> String.to_integer(elem) end)
@@ -46,21 +46,21 @@ defmodule Parsex.Subtitle.Line do
     "#{h}:#{m}:#{s},#{ms}"
   end
 
-  defp unescape_line(line) do
+  def unescape_line(line) do
     Enum.map(line, fn(text) ->
       text = String.replace(text, ~r/\n|\t|\r/, "")
       :iconv.convert("ISO-8859-1", "UTF-8", text)
     end)
   end
 
-  defp format_timestamp(timestamp) do
+  def format_timestamp(timestamp) do
     timestamp = String.split(timestamp, " --> ")
     start_time = List.first(timestamp) |> timestamp_to_seconds
     end_time = List.last(timestamp) |> timestamp_to_seconds
     %{start_time: start_time, end_time: end_time}
   end
 
-  defp append_zero(number, type \\ :normal) do
+  def append_zero(number, type \\ :normal) do
     case type do
       :ms ->
         String.rjust(to_string(number), 3, ?0)
@@ -69,7 +69,7 @@ defmodule Parsex.Subtitle.Line do
     end
   end
 
-  defp parse_line(line) do
+  def parse_line(line) do
     line = unescape_line(line)
     try do
         line_number = Enum.at(line, 0) |> String.to_integer()
@@ -87,7 +87,7 @@ defmodule Parsex.Subtitle.Line do
     end
   end
 
-  defp sync_line(line, sync_time) do
+  def sync_line(line, sync_time) do
     {operator, parsed_sync_time} = parse_sync_time(sync_time)
     start_time = line.start_time
     end_time = line.end_time
@@ -103,7 +103,7 @@ defmodule Parsex.Subtitle.Line do
     |> Map.put(:end_time, end_time)
   end
 
-  defp parse_sync_time(sync_time) do
+  def parse_sync_time(sync_time) do
     instances = %{"ms" => 0.001, "s" => 1, "m" => 60, "h" => 3600}
 
     case String.match?(sync_time, ~r/([+-])([.,0-9]+)(ms|s|m|h)/) do
