@@ -5,26 +5,32 @@ defmodule Parsex.Subtitle.Line do
 
   def parse_all_lines(file_stream) do
     Enum.chunk_by(file_stream, fn(line) -> line != "\n" end)
-    |> Enum.filter(fn(elem) -> elem != ["\n"] end)
-    |> Enum.map(fn(line) -> parse_line(line) end)
-    |> Enum.drop_while(fn(line) -> is_nil(line) end)
+    |> ParallelStream.filter(fn(elem) -> elem != ["\n"] end)
+    |> Enum.into([])
+    |> ParallelStream.map(fn(line) -> parse_line(line) end)
+    |> Enum.into([])
+    |> ParallelStream.reject(fn(line) -> is_nil(line) end)
+    |> Enum.into([])
   end
 
   def sync_all_lines(lines, sync_time) do
     try do
-      Enum.map(lines, fn(line) -> sync_line(line, sync_time) end)
+      ParallelStream.map(lines, fn(line) -> sync_line(line, sync_time) end)
+      |> Enum.into([])
     rescue
       _ -> {nil, :error}
     end
   end
 
   def lines_to_string(lines) do
-    Enum.map(lines, fn(line)->
+    ParallelStream.map(lines, fn(line)->
       "#{line.number}\n" <>
       "#{seconds_to_timestamp(line.start_time)} --> " <>
       "#{seconds_to_timestamp(line.end_time)}\n" <>
       "#{Enum.join(line.text, "\n")}\n"
-    end) |> Enum.join("\n")
+    end)
+    |> Enum.into([])
+    |> Enum.join("\n")
   end
 
   def timestamp_to_seconds(time) do
@@ -37,7 +43,8 @@ defmodule Parsex.Subtitle.Line do
   def seconds_to_timestamp(seconds) do
     [sec_int, decimal] = Float.to_string(seconds, [decimals: 3])
     |> String.split(".")
-    |> Enum.map(fn(elem) -> String.to_integer(elem) end)
+    |> ParallelStream.map(fn(elem) -> String.to_integer(elem) end)
+    |> Enum.into([])
     h = round(Float.floor(seconds / 3600)) |> append_zero()
     m = round(Float.floor(rem(sec_int, 3600) / 60)) |> append_zero()
     s = rem(sec_int , 60) |> append_zero()
@@ -47,10 +54,11 @@ defmodule Parsex.Subtitle.Line do
   end
 
   def unescape_line(line) do
-    Enum.map(line, fn(text) ->
+    ParallelStream.map(line, fn(text) ->
       text = String.replace(text, ~r/\n|\t|\r/, "")
       :iconv.convert("ISO-8859-1", "UTF-8", text)
     end)
+    |> Enum.into([])
   end
 
   def format_timestamp(timestamp) do
@@ -72,16 +80,16 @@ defmodule Parsex.Subtitle.Line do
   def parse_line(line) do
     line = unescape_line(line)
     try do
-        line_number = Enum.at(line, 0) |> String.to_integer()
-        timestamp = Enum.at(line, 1) |> format_timestamp
-        texts = Enum.drop(line, 2)
+      line_number = Enum.at(line, 0) |> String.to_integer()
+      timestamp = Enum.at(line, 1) |> format_timestamp
+      texts = Enum.drop(line, 2)
 
-        %Parsex.Subtitle.Line{
-          number: line_number,
-          start_time: timestamp.start_time,
-          end_time: timestamp.end_time,
-          text: texts
-        }
+      %Parsex.Subtitle.Line{
+        number: line_number,
+        start_time: timestamp.start_time,
+        end_time: timestamp.end_time,
+        text: texts
+      }
     rescue
       _ -> nil
     end

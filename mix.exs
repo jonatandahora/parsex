@@ -14,7 +14,7 @@ defmodule Parsex.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :iconv]]
+    [applications: [:logger, :iconv, :parallel_stream]]
   end
 
   # Dependencies can be Hex packages:
@@ -28,7 +28,8 @@ defmodule Parsex.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:iconv, "~> 1.0", git: "https://github.com/processone/iconv.git"}
+      {:iconv, "~> 1.0", git: "https://github.com/processone/iconv.git"},
+      {:parallel_stream, "~> 1.0"}
     ]
   end
 end

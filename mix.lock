@@ -1,1 +1,2 @@
-%{"iconv": {:git, "https://github.com/processone/iconv.git", "7967a049957587ceac67e85ebeb38c7c014dcba3", []}}
+%{"iconv": {:git, "https://github.com/processone/iconv.git", "7967a049957587ceac67e85ebeb38c7c014dcba3", []},
+  "parallel_stream": {:hex, :parallel_stream, "1.0.5", "4c78d3e675f9eff885cbe252c89a8fc1d2fb803c0d03a914281e587834e09431", [:mix], []}}
